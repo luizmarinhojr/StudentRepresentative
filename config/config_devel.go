@@ -5,5 +5,5 @@ const (
 	PSQL_PORT_DEV   = "5432"
 	PSQL_USER_DEV   = "postgres"
 	PSQL_PASS_DEV   = "myrandompassword"
-	PSQL_DBNAME_DEV = "Representative"
+	PSQL_DBNAME_DEV = "representative"
 )

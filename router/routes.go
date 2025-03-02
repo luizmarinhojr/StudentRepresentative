@@ -12,6 +12,7 @@ func InitializeRoutes(r *gin.Engine) {
 		{
 			fromBase.GET("/students", controller.GetAllStudents)
 			fromBase.POST("student", controller.CreateStudent)
+			fromBase.GET("/student/:id", controller.GetStudentById)
 			fromBase.GET("/students/name/:name", controller.GetAllStudentsByName)
 			fromBase.GET("/students/registration/:registration", controller.GetOneStudentByRegistration)
 		}
