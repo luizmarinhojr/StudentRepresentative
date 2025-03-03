@@ -48,8 +48,8 @@ func (st *Student) QuerySelectAll() string {
 	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students;"
 }
 
-func (st *Student) QuerySelectById() string {
-	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1"
+func (st *Student) QuerySelectById() (string, []any) {
+	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1", []any{&st.Name, &st.LastName, &st.Registration, &st.CreatedAt, &st.UpdatedAt}
 }
 
 // STUDENTRESPONSE'S METHODS
@@ -62,5 +62,5 @@ func (st *StudentResponse) QuerySelectAll() string {
 }
 
 func (st *StudentResponse) QuerySelectById() (string, []any) {
-	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1", []any{&st.Name, &st.LastName, &st.Registration, &st.CreatedAt, &st.UpdatedAt}
+	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1", []any{&st.Id, &st.Name, &st.LastName, &st.Registration, &st.CreatedAt, &st.UpdatedAt}
 }
