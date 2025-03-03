@@ -39,32 +39,28 @@ func GetAllStudents() (*[]schema.StudentResponse, error) {
 }
 
 func CreateStudent(student *schema.Student) (string, error) {
-	db := getConnection()
-	query, err := db.Prepare("INSERT INTO students (name, last_name, registration) VALUES ($1, $2, $3) RETURNING id;")
+	db, err := getConnection().Begin()
 	if err != nil {
-		return "", fmt.Errorf("erro aqui: %v", err)
+		return "", fmt.Errorf("error to begin a transaction: %v", err)
 	}
 	var id string
-	err = query.QueryRow(student.Name, student.LastName, student.Registration).Scan(&id)
-	if err != nil {
-		return "", fmt.Errorf("erro no scan: %v", err)
+	row := db.QueryRow("INSERT INTO students (name, last_name, registration) VALUES ($1, $2, $3) RETURNING id;", student.Name, student.LastName, student.Registration)
+	if err := row.Scan(&id); err != nil {
+		db.Rollback()
+		return "", fmt.Errorf("it couldn't recovery the id correctly: %v", err)
 	}
-	query.Close()
+	db.Commit()
 	return id, nil
 }
 
 func GetStudentById(id string) (*schema.StudentResponse, error) {
 	db := getConnection()
-	rows, err := db.Query("SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = ?;", id)
-	if err != nil {
-		return nil, fmt.Errorf("it couldn't recovery the data correctly: %v", err)
-	}
+	row := db.QueryRow("SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1", id)
 	var st schema.StudentResponse
-	for rows.Next() {
-		if err := rows.Scan(&st.Id, &st.Name, &st.LastName, &st.Registration, &st.CreatedAt, &st.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("it couldn't recovery the data correctly: %v", err)
-		}
+	if err := row.Scan(&st.Id, &st.Name, &st.LastName, &st.Registration, &st.CreatedAt, &st.UpdatedAt); err != nil {
+		fmt.Println("erro aqui: ", err)
+		return nil, fmt.Errorf("error to scan data: %v", err)
 	}
-	rows.Close()
+	db.Close()
 	return &st, nil
 }

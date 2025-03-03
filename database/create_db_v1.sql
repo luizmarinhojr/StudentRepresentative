@@ -8,6 +8,12 @@ CREATE table IF NOT EXISTS students (
     deleted_at TIMESTAMP
 );
 
+create table if not exists users (
+	id UUID primary key default gen_random_uuid(),
+	email VARCHAR(200),
+	password VARCHAR()
+)
+
 insert into students(name, last_name, registration) VALUES(
 	'Luiz Carlos',
 	'Marinho Junior',

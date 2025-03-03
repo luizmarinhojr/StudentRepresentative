@@ -38,3 +38,29 @@ func (st *StudentRequest) NewStudent() *Student {
 		Registration: st.Registration,
 	}
 }
+
+// STUDENT'S METHODS
+func (st *Student) QueryInsertInto() (string, []any) {
+	return "INSERT INTO students (name, last_name, registration) VALUES ($1, $2, $3) RETURNING id", []any{st.Name, st.LastName, st.Registration}
+}
+
+func (st *Student) QuerySelectAll() string {
+	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students;"
+}
+
+func (st *Student) QuerySelectById() string {
+	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1"
+}
+
+// STUDENTRESPONSE'S METHODS
+func (st *StudentResponse) QueryInsertInto() (string, []any) {
+	return "INSERT INTO students (name, last_name, registration) VALUES ($1, $2, $3) RETURNING id", []any{st.Name, st.LastName, st.Registration}
+}
+
+func (st *StudentResponse) QuerySelectAll() string {
+	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students;"
+}
+
+func (st *StudentResponse) QuerySelectById() (string, []any) {
+	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1", []any{&st.Name, &st.LastName, &st.Registration, &st.CreatedAt, &st.UpdatedAt}
+}
