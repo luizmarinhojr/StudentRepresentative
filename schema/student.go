@@ -64,3 +64,7 @@ func (st *StudentResponse) QuerySelectAll() string {
 func (st *StudentResponse) QuerySelectById() (string, []any) {
 	return "SELECT id, name, last_name, registration, created_at, updated_at FROM students WHERE id = $1", []any{&st.Id, &st.Name, &st.LastName, &st.Registration, &st.CreatedAt, &st.UpdatedAt}
 }
+
+// func (st *StudentResponse) Return() () {
+// 	return st
+// }

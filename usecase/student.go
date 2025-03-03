@@ -9,11 +9,11 @@ import (
 
 func GetStudents() (*[]schema.StudentResponse, error) {
 	var st schema.StudentResponse
-	students, err := repository.SelectAllDb(&schema.Student{}, &st)
+	students, err := repository.SelectAllDb(&st, &st)
 	if err != nil {
 		return nil, fmt.Errorf("error to get all students in database: %v", err)
 	}
-	return students, nil
+	return &students, nil
 }
 
 func CreateStudent(std *schema.StudentRequest) (string, error) {

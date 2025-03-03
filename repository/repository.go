@@ -42,38 +42,41 @@ func GetConnection() *sql.DB {
 }
 
 func InsertIntoDb(entity schema.Repository) (string, error) {
-	db, err := GetConnection().Begin()
+	db := GetConnection()
+	transaction, err := db.Begin()
 	if err != nil {
 		return "", err
 	}
 	query, values := entity.QueryInsertInto()
-	row := db.QueryRow(query, values...)
+	row := transaction.QueryRow(query, values...)
 	var id string
 	if erro := row.Scan(&id); erro != nil {
-		db.Rollback()
+		transaction.Rollback()
 		return "", fmt.Errorf("error to insert in database: %v", erro)
 	}
-	db.Commit()
+	transaction.Commit()
+	db.Close()
 	return id, nil
 }
 
-func SelectAllDb[T schema.Entities](entity schema.Repository, response *T) (*[]T, error) {
+func SelectAllDb[T schema.Entities](entity schema.Repository, response *T) ([]T, error) {
 	db := getConnection()
 	sqlQuery := entity.QuerySelectAll()
 	rows, err := db.Query(sqlQuery)
 	if err != nil {
 		return nil, fmt.Errorf("error to select all: %v", err)
 	}
-	defer rows.Close()
 	pointers := schema.GetFieldPointers(response)
-	var listResponse []T
+	var list []T
 	for rows.Next() {
 		if erro := rows.Scan(pointers...); erro != nil {
 			return nil, fmt.Errorf("error to select all: %v", erro)
 		}
-		listResponse = append(listResponse, *response)
+		list = append(list, *response)
 	}
-	return &listResponse, nil
+	rows.Close()
+	db.Close()
+	return list, nil
 }
 
 func SelectById(entity schema.Repository, id string) error {
@@ -83,5 +86,6 @@ func SelectById(entity schema.Repository, id string) error {
 	if err := row.Scan(fields...); err != nil {
 		return fmt.Errorf("error to select all: %v", err)
 	}
+	db.Close()
 	return nil
 }
