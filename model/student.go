@@ -1,4 +1,4 @@
-package schema
+package model
 
 import (
 	"time"
@@ -6,21 +6,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type Professor struct {
+type Student struct {
 	Id           uuid.UUID `json:"id"`
 	Name         string    `json:"name"`
 	LastName     string    `json:"last_name"`
 	Registration string    `json:"registration"`
+	User         User      `json:"user"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 	DeletedAt    time.Time `json:"deleted_at"`
 }
 
-type ProfessorResponse struct {
-	Id           uuid.UUID `json:"id"`
-	Name         string    `json:"name"`
-	LastName     string    `json:"last_name"`
-	Registration string    `json:"registration"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+func (st *Student) New() *Student {
+	return &Student{}
 }

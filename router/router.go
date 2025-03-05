@@ -1,9 +1,12 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"database/sql"
 
-func Initialize() {
+	"github.com/gin-gonic/gin"
+)
+
+func InitializeApi(db *sql.DB) {
 	r := gin.Default()
-	InitializeRoutes(r)
-	r.Run() // listen and serve on 0.0.0.0:8080
+	InitializeRoutes(r, db)
 }
