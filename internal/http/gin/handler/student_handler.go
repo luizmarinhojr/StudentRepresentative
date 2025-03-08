@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/luizmarinhojr/StudentRepresentative/handler/request"
-	"github.com/luizmarinhojr/StudentRepresentative/usecase"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/request"
 )
 
 type StudentHandler struct {
@@ -31,7 +31,7 @@ func (sc *StudentHandler) GetStudents(c *gin.Context) {
 }
 
 func (sc *StudentHandler) CreateStudent(c *gin.Context) {
-	var student request.StudentRequest
+	var student request.Student
 	err := c.BindJSON(&student)
 	if err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)

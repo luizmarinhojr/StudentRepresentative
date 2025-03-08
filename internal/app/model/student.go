@@ -7,7 +7,8 @@ import (
 )
 
 type Student struct {
-	Id           uuid.UUID `json:"id"`
+	Id           int64     `json:"id"`
+	ExternalId   uuid.UUID `json:"external_id"`
 	Name         string    `json:"name"`
 	LastName     string    `json:"last_name"`
 	Registration string    `json:"registration"`
@@ -17,6 +18,6 @@ type Student struct {
 	DeletedAt    time.Time `json:"deleted_at"`
 }
 
-func (st *Student) New() *Student {
+func NewStudent() *Student {
 	return &Student{}
 }

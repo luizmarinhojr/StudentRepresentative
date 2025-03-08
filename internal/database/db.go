@@ -1,10 +1,9 @@
-package repository
+package database
 
 import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/lib/pq"
 	"github.com/luizmarinhojr/StudentRepresentative/config"
 )
 

@@ -38,9 +38,11 @@ ADD CONSTRAINT fk_students_users
 FOREIGN KEY (user_id)
 REFERENCES users(id);
 
-SELECT s.id, s.name, s.last_name, s.registration, s.created_at, s.updated_at, u.id, u.email FROM students s full join users u on s.user_id = u.id;
+SELECT s.id, s.name, s.last_name, s.registration, s.created_at, s.updated_at, u.id, u.email, u.created_at, u.updated_at FROM students s full join users u on s.user_id = u.id;
 
 
 insert into users (email, pass) VALUES('marweedofc@gmail.com', 'smadjsa1uh32u1ybhbdudybhdbaysudvasuyjhsd(*d78sAdusa');
 
 update students set user_id = '5d806edb-cc34-46c6-97e1-9ef6a708a443' where id = '32181552-16df-46cf-8934-83dabe617c70';
+
+SELECT s.id, s.name, s.last_name, s.registration, s.created_at, s.updated_at, u.id, u.email, u.created_at, u.updated_at FROM students s full join users u on s.user_id = u.id where s.id = '32181552-16df-46cf-8934-83dabe617c70';
