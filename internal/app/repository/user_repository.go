@@ -32,7 +32,7 @@ func (u *UserRepository) FindByEmail(user *model.User) error {
 func (u *UserRepository) ExistsByEmail(email *string, exists *bool) error {
 	queryExistsByEmail := "SELECT EXISTS (SELECT 1 FROM users WHERE email = $1);"
 	row := u.db.QueryRow(queryExistsByEmail, *email)
-	if err := row.Scan(&exists); err != nil {
+	if err := row.Scan(exists); err != nil {
 		return err
 	}
 	return nil

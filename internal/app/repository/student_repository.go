@@ -72,8 +72,7 @@ func (sr *StudentRepository) Save(st *model.Student) error {
 func (sr *StudentRepository) ExistsByRegistration(registration *string, exists *bool) error {
 	queryExistsByRegistration := "SELECT EXISTS (SELECT 1 FROM students WHERE registration = $1);"
 	row := sr.db.QueryRow(queryExistsByRegistration, *registration)
-	err := row.Scan(exists)
-	if err != nil {
+	if err := row.Scan(exists); err != nil {
 		return err
 	}
 	return nil
@@ -84,6 +83,15 @@ func (sr *StudentRepository) UpdateUserByRegistration(userId int64, registration
 	_, err := sr.db.Exec(queryUpdateUserByRegistration, userId, registration)
 	if err != nil {
 		return fmt.Errorf("error to update students table: %v", err)
+	}
+	return nil
+}
+
+func (sr *StudentRepository) ExistsUserByRegistration(registration *string, exists *bool) error {
+	queryExistsUserByRegistration := `SELECT EXISTS (SELECT 1 FROM students WHERE registration = $1 AND user_id IS NOT NULL);`
+	row := sr.db.QueryRow(queryExistsUserByRegistration, *registration)
+	if err := row.Scan(exists); err != nil {
+		return err
 	}
 	return nil
 }

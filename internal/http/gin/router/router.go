@@ -1,12 +1,11 @@
 package router
 
 import (
-	"database/sql"
-
 	"github.com/gin-gonic/gin"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/dependencies"
 )
 
-func InitializeApi(db *sql.DB) {
+func InitializeApi(dependency dependencies.Dependencies) {
 	r := gin.Default()
-	InitializeRoutes(r, db)
+	InitializeRoutes(r, dependency)
 }

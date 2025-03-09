@@ -4,17 +4,20 @@ import (
 	"fmt"
 
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/repository"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validator"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/request"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/response"
 )
 
 type StudentUseCase struct {
-	repo repository.StudentRepository
+	repo       repository.StudentRepository
+	validators []validator.StudentRegisterValidator
 }
 
-func NewStudentUseCase(rp repository.StudentRepository) *StudentUseCase {
+func NewStudentUseCase(rp repository.StudentRepository, vl ...validator.StudentRegisterValidator) *StudentUseCase {
 	return &StudentUseCase{
-		repo: rp,
+		repo:       rp,
+		validators: vl,
 	}
 }
 
@@ -28,12 +31,13 @@ func (su *StudentUseCase) GetStudents() (*[]response.Student, error) {
 }
 
 func (su *StudentUseCase) CreateStudent(std *request.Student) (string, error) {
-	student := std.New()
-	err := su.checkDuplication(std)
-	if err != nil {
-		return "", err
+	for _, v := range su.validators {
+		if err := v.Validate(std); err != nil {
+			return "", err
+		}
 	}
-	err = su.repo.Save(student)
+	student := std.New()
+	err := su.repo.Save(student)
 	if err != nil {
 		return "", fmt.Errorf("error to create student in database: %v", err)
 	}
@@ -47,16 +51,4 @@ func (su *StudentUseCase) GetStudentById(id string) (*response.Student, error) {
 		return nil, fmt.Errorf("it couldn't recovery the data correctly: %v", err)
 	}
 	return &st, nil
-}
-
-func (su *StudentUseCase) checkDuplication(st *request.Student) error {
-	var exists bool
-	err := su.repo.ExistsByRegistration(&st.Registration, &exists)
-	if err != nil {
-		return err
-	}
-	if exists {
-		return fmt.Errorf("there is a student registered by this email")
-	}
-	return nil
 }

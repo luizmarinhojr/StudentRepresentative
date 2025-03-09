@@ -20,7 +20,7 @@ func NewUserHandler(us usecase.UserUseCase) *UserHandler {
 }
 
 func (u *UserHandler) SignIn(c *gin.Context) {
-	var user request.User
+	var user request.Login
 	err := c.BindJSON(&user)
 
 	if err != nil {
@@ -39,15 +39,22 @@ func (u *UserHandler) SignIn(c *gin.Context) {
 }
 
 func (u *UserHandler) SignUp(c *gin.Context) {
-	var login request.Login
-	err := c.BindJSON(&login)
+	var user request.User
+	err := c.BindJSON(&user)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	err = u.usecase.SignUp(&login)
+	err = user.Validate()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
+	id, erro := u.usecase.SignUp(&user)
+	if erro != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": erro.Error()})
+		return
+	}
+	c.Header("Location", id)
 	c.Status(http.StatusCreated)
 }

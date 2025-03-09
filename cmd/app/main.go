@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/dependencies"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/database"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/router"
 )
@@ -13,5 +14,7 @@ func main() {
 		log.Fatal("Error to connect to database:", err)
 	}
 
-	router.InitializeApi(db)
+	dependencies := dependencies.Inject(db)
+
+	router.InitializeApi(*dependencies)
 }

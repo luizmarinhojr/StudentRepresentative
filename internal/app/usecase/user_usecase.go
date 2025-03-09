@@ -6,26 +6,30 @@ import (
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/auth"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/repository"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/service"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validator"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/request"
 )
 
 type UserUseCase struct {
-	userRepo        repository.UserRepository
-	studentRepo     repository.StudentRepository
-	studentService  service.StudentService
-	passwordService service.PasswordService
+	userRepo          repository.UserRepository
+	studentRepo       repository.StudentRepository
+	passwordService   service.PasswordService
+	studentValidators []validator.StudentRegisterValidator
+	userValidators    []validator.UserRegisterValidator
 }
 
-func NewUserUseCase(rpu repository.UserRepository, rps repository.StudentRepository, sv service.StudentService, ps service.PasswordService) *UserUseCase {
+func NewUserUseCase(rpu repository.UserRepository, rps repository.StudentRepository,
+	ps service.PasswordService, sv []validator.StudentRegisterValidator, vl ...validator.UserRegisterValidator) *UserUseCase {
 	return &UserUseCase{
-		userRepo:        rpu,
-		studentRepo:     rps,
-		studentService:  sv,
-		passwordService: ps,
+		userRepo:          rpu,
+		studentRepo:       rps,
+		passwordService:   ps,
+		userValidators:    vl,
+		studentValidators: sv,
 	}
 }
 
-func (us *UserUseCase) SignIn(user *request.User) (*string, error) {
+func (us *UserUseCase) SignIn(user *request.Login) (*string, error) {
 	userDb := user.New()
 	err := us.userRepo.FindByEmail(userDb)
 	if err != nil {
@@ -42,32 +46,24 @@ func (us *UserUseCase) SignIn(user *request.User) (*string, error) {
 	return &token, nil
 }
 
-func (us *UserUseCase) SignUp(user *request.Login) error {
-	var exists bool
-	err := us.userRepo.ExistsByEmail(&user.Email, &exists)
-	if err != nil {
-		return fmt.Errorf("you do not have permission to sign up")
-	}
-	if exists {
-		return fmt.Errorf("there is a student registered by this email")
-	}
-	err = us.studentService.IsStudentRegistered(&user.Registration)
-	if err == nil {
-		return fmt.Errorf("you do not have permission to sign up 2")
+func (us *UserUseCase) SignUp(user *request.User) (string, error) {
+	for _, v := range us.userValidators {
+		if err := v.Validate(user); err != nil {
+			return "", err
+		}
 	}
 	userModel := user.New()
 	passwordHash, erro := us.passwordService.HashPassword(userModel.Password)
 	if erro != nil {
-		return fmt.Errorf("error to hash password: %v", erro)
+		return "", fmt.Errorf("error to hash password: %v", erro)
 	}
 	userModel.Password = passwordHash
-	err = us.userRepo.Save(userModel)
-	if err != nil {
-		return fmt.Errorf("error to save de user in database: %v", err)
+	if err := us.userRepo.Save(userModel); err != nil {
+		return "", err
 	}
-	err = us.studentRepo.UpdateUserByRegistration(userModel.Id, user.Registration)
-	if err != nil {
-		return err
+	if err := us.studentRepo.UpdateUserByRegistration(userModel.Id, user.Registration); err != nil {
+		return "", err
 	}
-	return nil
+
+	return userModel.ExternalId.String(), nil
 }

@@ -6,8 +6,9 @@ import (
 )
 
 type User struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	Email        string `json:"email" validate:"required,email"`
+	Password     string `json:"password" validate:"required,min=8"`
+	Registration string `json:"registration" validate:"required,min=12,max=12"`
 }
 
 func (us *User) New() *model.User {

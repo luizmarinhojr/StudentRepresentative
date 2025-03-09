@@ -1,8 +1,6 @@
 package service
 
 import (
-	"log"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -14,7 +12,6 @@ func NewPasswordService() *PasswordService {
 
 func (ps *PasswordService) HashPassword(password []byte) ([]byte, error) {
 	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-	log.Println(hash)
 	return hash, err
 }
 
