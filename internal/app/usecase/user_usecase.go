@@ -8,6 +8,7 @@ import (
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/service"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validator"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/request"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/response"
 )
 
 type UserUseCase struct {
@@ -66,4 +67,13 @@ func (us *UserUseCase) SignUp(user *request.User) (string, error) {
 	}
 
 	return userModel.ExternalId.String(), nil
+}
+
+func (us *UserUseCase) GetUsers() (*[]response.Student, error) {
+	var students []response.Student
+	err := us.userRepo.FindAll(&students)
+	if err != nil {
+		return nil, err
+	}
+	return &students, nil
 }

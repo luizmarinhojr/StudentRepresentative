@@ -58,3 +58,12 @@ func (u *UserHandler) SignUp(c *gin.Context) {
 	c.Header("Location", id)
 	c.Status(http.StatusCreated)
 }
+
+func (u *UserHandler) GetUsers(c *gin.Context) {
+	users, err := u.usecase.GetUsers()
+	if err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}

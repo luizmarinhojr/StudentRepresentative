@@ -20,15 +20,14 @@ func NewStudentRepository(con *sql.DB) *StudentRepository {
 }
 
 func (sr *StudentRepository) FindAll(st *[]response.Student) error {
-	querySelectAll := `SELECT s.external_id, s.name, s.last_name, s.registration, s.created_at, 
-						s.updated_at, u.external_id, u.email, u.created_at, u.updated_at 
-						FROM students s left join users u on s.user_id = u.id;`
-	var s response.Student
-	rows, err := sr.db.Query(querySelectAll)
+	queryFindAll := `SELECT s.external_id, s.name, s.last_name, s.registration, s.created_at, s.updated_at, 
+		u.external_id, u.email, u.created_at, u.updated_at FROM students s left join users u on s.user_id = u.id;`
+	rows, err := sr.db.Query(queryFindAll)
 	if err != nil {
 		return fmt.Errorf("error to select all: %v", err)
 	}
 	defer rows.Close()
+	var s response.Student
 	for rows.Next() {
 		if err = rows.Scan(&s.ExternalId, &s.Name, &s.LastName, &s.Registration, &s.CreatedAt, &s.UpdatedAt,
 			&s.User.ExternalId, &s.User.Email, &s.User.CreatedAt, &s.User.UpdatedAt); err != nil {

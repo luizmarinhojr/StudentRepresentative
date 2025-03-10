@@ -8,18 +8,19 @@ import (
 
 func InitializeRoutes(r *gin.Engine, dependency dependencies.Dependencies) {
 
-	fromBase := r.Group("/api/v1")
+	baseURL := r.Group("/api/v1")
 	{
 		{
-			fromBase.POST("student", dependency.StudentHandler.CreateStudent)
-			fromBase.GET("/student/:id", dependency.StudentHandler.GetStudentById)
-			fromBase.GET("/students", middleware.CheckAuth, dependency.StudentHandler.GetStudents)
-			fromBase.GET("/students/name/:name", dependency.StudentHandler.GetAllStudentsByName)
-			fromBase.GET("/students/registration/:registration", dependency.StudentHandler.GetOneStudentByRegistration)
+			baseURL.POST("student", dependency.StudentHandler.CreateStudent)
+			baseURL.GET("/student/:id", dependency.StudentHandler.GetStudentById)
+			baseURL.GET("/students", middleware.CheckAuth, dependency.StudentHandler.GetStudents)
+			baseURL.GET("/students/name/:name", dependency.StudentHandler.GetAllStudentsByName)
+			baseURL.GET("/students/registration/:registration", dependency.StudentHandler.GetOneStudentByRegistration)
 		}
 		{
-			fromBase.POST("signin", dependency.UserHandler.SignIn)
-			fromBase.POST("signup", dependency.UserHandler.SignUp)
+			baseURL.POST("signin", dependency.UserHandler.SignIn)
+			baseURL.POST("signup", dependency.UserHandler.SignUp)
+			baseURL.GET("users", dependency.UserHandler.GetUsers)
 		}
 	}
 

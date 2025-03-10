@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/model"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/response"
 )
 
 type UserRepository struct {
@@ -29,15 +30,6 @@ func (u *UserRepository) FindByEmail(user *model.User) error {
 	return nil
 }
 
-func (u *UserRepository) ExistsByEmail(email *string, exists *bool) error {
-	queryExistsByEmail := "SELECT EXISTS (SELECT 1 FROM users WHERE email = $1);"
-	row := u.db.QueryRow(queryExistsByEmail, *email)
-	if err := row.Scan(exists); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (u *UserRepository) Save(user *model.User) error {
 	queryInsertInto := `INSERT INTO users(email, pass) VALUES($1, $2) RETURNING external_id, id;`
 	transaction, err := u.db.Begin()
@@ -52,6 +44,34 @@ func (u *UserRepository) Save(user *model.User) error {
 	err = transaction.Commit()
 	if err != nil {
 		return fmt.Errorf("error to commit the changes: %v", err)
+	}
+	return nil
+}
+
+func (u *UserRepository) FindAll(stds *[]response.Student) error {
+	queryFindAll := `select u.external_id, u.email, s.external_id, s.name, s.last_name, 
+		s.registration, u.created_at, u.updated_at, s.created_at, s.updated_at from users u inner join students s on u.id = s.user_id;`
+	rows, err := u.db.Query(queryFindAll)
+	if err != nil {
+		return fmt.Errorf("error to find all users: %v", err)
+	}
+	defer rows.Close()
+	var student response.Student
+	for rows.Next() {
+		if err = rows.Scan(&student.User.ExternalId, &student.User.Email, &student.ExternalId, &student.Name, &student.LastName,
+			&student.Registration, &student.User.CreatedAt, &student.User.UpdatedAt, &student.CreatedAt, &student.UpdatedAt); err != nil {
+			return fmt.Errorf("error to scan data: %v", err)
+		}
+		*stds = append(*stds, student)
+	}
+	return nil
+}
+
+func (u *UserRepository) ExistsByEmail(email *string, exists *bool) error {
+	queryExistsByEmail := "SELECT EXISTS (SELECT 1 FROM users WHERE email = $1);"
+	row := u.db.QueryRow(queryExistsByEmail, *email)
+	if err := row.Scan(exists); err != nil {
+		return err
 	}
 	return nil
 }
