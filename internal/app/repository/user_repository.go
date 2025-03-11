@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/model"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/response"
@@ -22,9 +21,7 @@ func NewUserRepository(conn *sql.DB) *UserRepository {
 func (u *UserRepository) FindByEmail(user *model.User) error {
 	query := `SELECT external_id, email, pass FROM users WHERE email = $1;`
 	row := u.db.QueryRow(query, user.Email)
-	log.Println("EMAIL DO USER:", user.Email)
 	if err := row.Scan(&user.ExternalId, &user.Email, &user.Password); err != nil {
-		log.Println("Entrou nesse erro")
 		return err
 	}
 	return nil
