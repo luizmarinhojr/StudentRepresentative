@@ -1,4 +1,4 @@
-package validator
+package validation
 
 import (
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/request"

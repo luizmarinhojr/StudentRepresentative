@@ -6,7 +6,7 @@ import (
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/repository"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/service"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase"
-	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validator"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validation"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/handler"
 )
 
@@ -14,8 +14,8 @@ type Dependencies struct {
 	StudentRepository        *repository.StudentRepository
 	UserRepository           *repository.UserRepository
 	PasswordService          *service.PasswordService
-	StudentRegisterValidator []validator.StudentRegisterValidator
-	UserRegisterValidator    []validator.UserRegisterValidator
+	StudentRegisterValidator []validation.StudentRegisterValidator
+	UserRegisterValidator    []validation.UserRegisterValidator
 	StudentUseCase           *usecase.StudentUseCase
 	UserUseCase              *usecase.UserUseCase
 	StudentHandler           *handler.StudentHandler
@@ -31,9 +31,9 @@ func Inject(db *sql.DB) *Dependencies {
 	passwordService := service.NewPasswordService()
 
 	// VALIDATORS
-	studentRegisterValidator := []validator.StudentRegisterValidator{validator.NewStudentDuplicationByRegister(*studentRepository)}
-	userRegisterValidator := []validator.UserRegisterValidator{validator.NewUserIsStudentExists(*studentRepository),
-		validator.NewStudentHaveUser(*studentRepository), validator.NewUserDuplicationByEmail(*userRepository)}
+	studentRegisterValidator := []validation.StudentRegisterValidator{validation.NewStudentDuplicationByRegister(*studentRepository)}
+	userRegisterValidator := []validation.UserRegisterValidator{validation.NewUserIsStudentExists(*studentRepository),
+		validation.NewStudentHaveUser(*studentRepository), validation.NewUserDuplicationByEmail(*userRepository)}
 
 	// USECASES
 	studentUseCase := usecase.NewStudentUseCase(*studentRepository, studentRegisterValidator...)

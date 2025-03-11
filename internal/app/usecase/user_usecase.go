@@ -6,7 +6,7 @@ import (
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/auth"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/repository"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/service"
-	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validator"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validation"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/request"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/response"
 )
@@ -15,12 +15,12 @@ type UserUseCase struct {
 	userRepo          repository.UserRepository
 	studentRepo       repository.StudentRepository
 	passwordService   service.PasswordService
-	studentValidators []validator.StudentRegisterValidator
-	userValidators    []validator.UserRegisterValidator
+	studentValidators []validation.StudentRegisterValidator
+	userValidators    []validation.UserRegisterValidator
 }
 
 func NewUserUseCase(rpu repository.UserRepository, rps repository.StudentRepository,
-	ps service.PasswordService, sv []validator.StudentRegisterValidator, vl ...validator.UserRegisterValidator) *UserUseCase {
+	ps service.PasswordService, sv []validation.StudentRegisterValidator, vl ...validation.UserRegisterValidator) *UserUseCase {
 	return &UserUseCase{
 		userRepo:          rpu,
 		studentRepo:       rps,

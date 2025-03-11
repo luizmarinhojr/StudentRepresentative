@@ -4,17 +4,17 @@ import (
 	"fmt"
 
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/repository"
-	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validator"
+	"github.com/luizmarinhojr/StudentRepresentative/internal/app/usecase/validation"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/request"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/response"
 )
 
 type StudentUseCase struct {
 	repo       repository.StudentRepository
-	validators []validator.StudentRegisterValidator
+	validators []validation.StudentRegisterValidator
 }
 
-func NewStudentUseCase(rp repository.StudentRepository, vl ...validator.StudentRegisterValidator) *StudentUseCase {
+func NewStudentUseCase(rp repository.StudentRepository, vl ...validation.StudentRegisterValidator) *StudentUseCase {
 	return &StudentUseCase{
 		repo:       rp,
 		validators: vl,
