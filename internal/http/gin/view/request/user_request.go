@@ -9,7 +9,7 @@ type User struct {
 	Email        string `json:"email" validate:"required,email"`
 	Password     string `json:"password" validate:"required,min=8,max=30"`
 	Registration string `json:"registration" validate:"required,min=12,max=12"`
-	LastLastName string `json:"last_last_name" validate:"required,max=40"`
+	LastName     string `json:"last_name" validate:"required,min=4,max=40"`
 }
 
 func (us *User) New() *model.User {

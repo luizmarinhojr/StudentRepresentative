@@ -22,6 +22,9 @@ func InitializeRoutes(r *gin.Engine, dependency dependencies.Dependencies) {
 			baseURL.POST("signup", dependency.UserHandler.SignUp)
 			baseURL.GET("users", dependency.UserHandler.GetUsers)
 		}
+		{
+			baseURL.GET("class/:id", dependency.ClassHandler.GetClassById)
+		}
 	}
 
 	r.Run()

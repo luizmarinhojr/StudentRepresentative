@@ -1,48 +1,52 @@
-CREATE table IF NOT EXISTS students (
-    id UUID PRIMARY key default gen_random_uuid(),
-    name VARCHAR(30) not NULL,
-    last_name VARCHAR(30) not NULL,
-    registration VARCHAR(12) not NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
-);
+CREATE TYPE user_role AS ENUM ('admin', 'student', 'representative');
 
 create table if not exists users (
-	id UUID primary key default gen_random_uuid(),
-	email VARCHAR(200) not null,
-	pass VARCHAR(254) not NULL, 
+	id serial primary key,
+	external_id UUID default gen_random_uuid() UNIQUE,
+	email VARCHAR(200) not null UNIQUE,
+	pass BYTEA not NULL, 
+	role user_role default 'student',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
-insert into students(name, last_name, registration) VALUES(
-	'Luiz Carlos',
-	'Marinho Junior',
-	'202512530075'
+CREATE table IF NOT EXISTS students (
+	id serial primary key,
+    external_id UUID default gen_random_uuid() UNIQUE,
+    name VARCHAR(30) not NULL,
+    last_name VARCHAR(30) not NULL,
+    registration VARCHAR(12) not null UNIQUE,
+    user_id INTEGER UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+    CONSTRAINT fk_students_users
+      FOREIGN KEY(user_id)
+        REFERENCES users(id)
 );
 
-select * from students;
+create table if not exists classes (
+	id serial primary key,
+	external_id UUID default gen_random_uuid() UNIQUE,
+	name VARCHAR(30) not null unique,
+	start_year smallint not null CHECK (start_year >= EXTRACT(YEAR FROM CURRENT_DATE) - 5 AND start_year <= EXTRACT(YEAR FROM CURRENT_DATE) + 5),
+	start_semester smallint not null CHECK (start_semester IN (1, 2)),
+	end_year smallint not null CHECK (end_year >= start_year and end_year <= EXTRACT(YEAR FROM CURRENT_DATE) + 7),
+	end_semester smallint not null CHECK (end_semester IN (1, 2)),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+	CHECK (
+        (end_year > start_year) OR
+        (end_year = start_year AND end_semester >= start_semester)
+    )
+);
 
-ALTER TABLE students
-ALTER COLUMN registration SET DEFAULT generate_registration();
+create table if not exists students_classes (
+	id_student INTEGER references students(id),
+	id_class INTEGER references classes(id),
+	enrollment_date DATE DEFAULT CURRENT_DATE,
+	primary KEY(id_student, id_class)
+);
 
-SELECT EXISTS (SELECT 1 FROM students WHERE registration = '202512530075');
-
-select name from students where registration = '202512530075';
-
-ALTER TABLE students
-ADD COLUMN user_id UUID,
-ADD CONSTRAINT fk_students_users
-FOREIGN KEY (user_id)
-REFERENCES users(id);
-
-SELECT s.id, s.name, s.last_name, s.registration, s.created_at, s.updated_at, u.id, u.email, u.created_at, u.updated_at FROM students s full join users u on s.user_id = u.id;
-
-
-insert into users (email, pass) VALUES('marweedofc@gmail.com', 'smadjsa1uh32u1ybhbdudybhdbaysudvasuyjhsd(*d78sAdusa');
-
-update students set user_id = '5d806edb-cc34-46c6-97e1-9ef6a708a443' where id = '32181552-16df-46cf-8934-83dabe617c70';
-
-SELECT s.id, s.name, s.last_name, s.registration, s.created_at, s.updated_at, u.id, u.email, u.created_at, u.updated_at FROM students s full join users u on s.user_id = u.id where s.id = '32181552-16df-46cf-8934-83dabe617c70';

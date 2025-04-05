@@ -11,47 +11,45 @@ import (
 )
 
 type Dependencies struct {
-	StudentRepository        *repository.StudentRepository
-	UserRepository           *repository.UserRepository
-	PasswordService          *service.PasswordService
-	StudentRegisterValidator []validation.StudentRegisterValidator
-	UserRegisterValidator    []validation.UserRegisterValidator
-	StudentUseCase           *usecase.StudentUseCase
-	UserUseCase              *usecase.UserUseCase
-	StudentHandler           *handler.StudentHandler
-	UserHandler              *handler.UserHandler
+	StudentHandler *handler.StudentHandler
+	UserHandler    *handler.UserHandler
+	ClassHandler   *handler.ClassHandler
 }
 
 func Inject(db *sql.DB) *Dependencies {
 	// REPOSITORIES
 	studentRepository := repository.NewStudentRepository(db)
 	userRepository := repository.NewUserRepository(db)
+	classRepository := repository.NewClassRepository(db)
 
 	// SERVICES
 	passwordService := service.NewPasswordService()
 
 	// VALIDATORS
-	studentRegisterValidator := []validation.StudentRegisterValidator{validation.NewStudentDuplicationByRegister(*studentRepository)}
-	userRegisterValidator := []validation.UserRegisterValidator{validation.NewUserIsStudentExists(*studentRepository),
-		validation.NewStudentHaveUser(*studentRepository), validation.NewUserDuplicationByEmail(*userRepository)}
+	studentRegisterValidator := []validation.StudentRegisterValidator{
+		validation.NewStudentDuplicationByRegister(*studentRepository),
+	}
+
+	userRegisterValidator := []validation.UserRegisterValidator{
+		validation.NewUserIsStudentExists(*studentRepository),
+		validation.NewStudentHaveUser(*studentRepository),
+		validation.NewUserDuplicationByEmail(*userRepository),
+		validation.NewUserValidationByLastName(*studentRepository),
+	}
 
 	// USECASES
 	studentUseCase := usecase.NewStudentUseCase(*studentRepository, studentRegisterValidator...)
 	userUseCase := usecase.NewUserUseCase(*userRepository, *studentRepository, *passwordService, studentRegisterValidator, userRegisterValidator...)
+	classUseCase := usecase.NewClassUseCase(*classRepository)
 
 	// HANDLERS
 	studentHanler := handler.NewStudentController(*studentUseCase)
 	userHandler := handler.NewUserHandler(*userUseCase)
+	classHandler := handler.NewClassHandler(*classUseCase)
 
 	return &Dependencies{
-		StudentRepository:        studentRepository,
-		UserRepository:           userRepository,
-		PasswordService:          passwordService,
-		StudentRegisterValidator: studentRegisterValidator,
-		UserRegisterValidator:    userRegisterValidator,
-		StudentUseCase:           studentUseCase,
-		UserUseCase:              userUseCase,
-		StudentHandler:           studentHanler,
-		UserHandler:              userHandler,
+		StudentHandler: studentHanler,
+		UserHandler:    userHandler,
+		ClassHandler:   classHandler,
 	}
 }

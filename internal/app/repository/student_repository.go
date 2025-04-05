@@ -86,6 +86,15 @@ func (sr *StudentRepository) UpdateUserByRegistration(userId int64, registration
 	return nil
 }
 
+func (sr *StudentRepository) ExistsStudentByLastNameAndRegistration(lastName, registration *string, exists *bool) error {
+	queryExistsStudentByLastNameAndRegistration := `SELECT EXISTS (SELECT 1 FROM students WHERE registration = $1 AND last_name = $2);`
+	row := sr.db.QueryRow(queryExistsStudentByLastNameAndRegistration, *registration, *lastName)
+	if err := row.Scan(exists); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (sr *StudentRepository) ExistsUserByRegistration(registration *string, exists *bool) error {
 	queryExistsUserByRegistration := `SELECT EXISTS (SELECT 1 FROM students WHERE registration = $1 AND user_id IS NOT NULL);`
 	row := sr.db.QueryRow(queryExistsUserByRegistration, *registration)
