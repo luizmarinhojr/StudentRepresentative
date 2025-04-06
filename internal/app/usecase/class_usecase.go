@@ -1,8 +1,6 @@
 package usecase
 
 import (
-	"fmt"
-
 	"github.com/luizmarinhojr/StudentRepresentative/internal/app/repository"
 	"github.com/luizmarinhojr/StudentRepresentative/internal/http/gin/view/response"
 )
@@ -17,12 +15,20 @@ func NewClassUseCase(rep repository.ClassRepository) *ClassUseCase {
 	}
 }
 
+func (cc *ClassUseCase) GetClasses() (*[]response.Class, error) {
+	var classes []response.Class
+	err := cc.repo.FindAll(&classes)
+	if err != nil {
+		return nil, err
+	}
+	return &classes, nil
+}
+
 func (cc *ClassUseCase) GetClassById(id string) (*response.Class, error) {
 	var class response.Class
 	err := cc.repo.FindById(&class, id)
-	fmt.Println("CLASSE NO USECASE:", class.Name)
 	if err != nil {
-		return nil, fmt.Errorf("error to find by id: %v", err)
+		return nil, err
 	}
 	return &class, nil
 }

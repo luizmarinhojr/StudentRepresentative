@@ -24,6 +24,7 @@ func InitializeRoutes(r *gin.Engine, dependency dependencies.Dependencies) {
 		}
 		{
 			baseURL.GET("class/:id", dependency.ClassHandler.GetClassById)
+			baseURL.GET("classes", dependency.ClassHandler.GetClasses)
 		}
 	}
 

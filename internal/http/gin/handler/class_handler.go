@@ -18,9 +18,18 @@ func NewClassHandler(us usecase.ClassUseCase) *ClassHandler {
 	}
 }
 
+func (ch *ClassHandler) GetClasses(ctx *gin.Context) {
+	classes, err := ch.usecase.GetClasses()
+	if err != nil {
+		fmt.Println(err)
+		ctx.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	ctx.JSON(http.StatusOK, classes)
+}
+
 func (ch *ClassHandler) GetClassById(ctx *gin.Context) {
 	class, err := ch.usecase.GetClassById(ctx.Param("id"))
-	fmt.Println("CLASSE: ", class)
 	if err != nil {
 		fmt.Println(err)
 		ctx.Writer.WriteHeader(http.StatusNotFound)
